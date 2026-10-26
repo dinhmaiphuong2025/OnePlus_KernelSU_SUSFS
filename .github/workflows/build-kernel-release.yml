@@ -17,6 +17,8 @@ on:
         required: true
         type: choice
         options:
+          - OP-PAD-2-SM8650 (A16)
+          - OP-PAD-2-SM8650
           - A14+15+16
           - A15+16
           - A14+15
@@ -28,7 +30,7 @@ on:
           - android14-6.1
           - android13-5.15
           - android12-5.10
-        default: A14+15+16
+        default: OP-PAD-2-SM8650 (A16)
       ksu_options:
         description: 'Enter KernelSU build json'
         required: true
@@ -137,6 +139,14 @@ jobs:
           jq_filter="."
           
           case "$input" in
+            "OP-PAD-2-SM8650 (A16)"|"OP-PAD-2-SM8650_A16")
+              jq_filter="map(select(.model == \"OP-PAD-2-SM8650\" and .os_version == \"A16\"))"
+              echo "ℹ️  Filtered for OP-PAD-2-SM8650 (A16)"
+              ;;
+            OP-PAD-2-SM8650)
+              jq_filter="map(select(.model == \"OP-PAD-2-SM8650\"))"
+              echo "ℹ️  Filtered for OP-PAD-2-SM8650"
+              ;;
             A14+15+16)
               ;;
             A15+16)
@@ -163,6 +173,18 @@ jobs:
               
               echo "ℹ️  Android-Kernel filter applied: $av-$kv"
               echo "   Restricted to: A15 and A16 only"
+              ;;
+            OP-*_A*|op-*_a*|OP-*_a*|op-*_A*)
+              IFS='_' read -r m os <<< "$input"
+              os_up=$(echo "$os" | tr '[:lower:]' '[:upper:]')
+              m_up=$(echo "$m" | tr '[:lower:]' '[:upper:]')
+              jq_filter="map(select((.model | ascii_upcase) == \"$m_up\" and (.os_version | ascii_upcase) == \"$os_up\"))"
+              echo "ℹ️  Filtered by model $m_up and OS $os_up"
+              ;;
+            OP-*|op-*)
+              m_up=$(echo "$input" | tr '[:lower:]' '[:upper:]')
+              jq_filter="map(select((.model | ascii_upcase) == \"$m_up\"))"
+              echo "ℹ️  Filtered by model $m_up"
               ;;
             *)
               echo "::warning::Unknown input '$input'. Using empty filter."
