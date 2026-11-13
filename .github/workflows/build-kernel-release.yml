@@ -35,7 +35,7 @@ on:
         description: 'Enter KernelSU build json'
         required: true
         type: string
-        default: '[{"type":"ksun","hash":"4cb8ee68fb9e8efb1ca37501c08eb57ded6c3c62"}]'
+        default: '[{"type":"ksun","hash":"dev"}]'
       optimize_level:
         description: "Compiler optimization level"
         required: true
